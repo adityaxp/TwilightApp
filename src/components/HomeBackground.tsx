@@ -1,4 +1,4 @@
-import { ImageBackground, View, StyleSheet } from "react-native";
+import { ImageBackground, View, StyleSheet, Image } from "react-native";
 import React from "react";
 import { Canvas, LinearGradient, Rect, vec } from "@shopify/react-native-skia";
 import { SIZES, COLORS } from "../themes";
@@ -38,7 +38,21 @@ export const HomeBackground = () => {
             />
           </Rect>
         </Canvas>
+        <Image
+          source={require("../../assets/home/House.png")}
+          resizeMode="cover"
+          style={styles.houseImage}
+        />
       </ImageBackground>
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  houseImage: {
+    width: SIZES.width,
+    height: SIZES.width,
+    ...StyleSheet.absoluteFillObject,
+    top: "36%",
+  },
+});

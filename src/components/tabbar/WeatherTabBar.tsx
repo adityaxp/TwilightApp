@@ -3,12 +3,15 @@ import React from "react";
 import { COLORS, SIZES } from "../../themes";
 import ArcComponent from "./elements/ArcComponent";
 import TabBarItems from "./elements/TabBarItems";
+import { BlurView } from "expo-blur";
 
 const WeatherTabBar = () => {
   const tabBarHeight: any = 100;
 
   return (
-    <View
+    <BlurView
+      intensity={50}
+      tint="dark"
       style={{
         height: tabBarHeight,
         ...StyleSheet.absoluteFillObject,
@@ -17,7 +20,7 @@ const WeatherTabBar = () => {
     >
       <ArcComponent height={tabBarHeight} width={SIZES.width} />
       <TabBarItems />
-    </View>
+    </BlurView>
   );
 };
 
