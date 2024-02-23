@@ -4,13 +4,17 @@ import { Weather } from "../../models/Weather";
 import { DEGREE_SYMBOL } from "../../utils/Constants";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { COLORS } from "../../themes";
+import { useWeatherData } from "../../context/WeatherDataContext";
 
 interface WeatherInfoProps {
   weather: Weather;
 }
 
-const WeatherInfo = ({ weather }: WeatherInfoProps) => {
-  const { city, temperature, condition, high, low } = weather;
+const WeatherInfo = () => {
+  const { weatherData } = useWeatherData();
+  const {
+    currentWeather: { city, temperature, condition, high, low },
+  } = weatherData;
   const { top } = useSafeAreaInsets();
   const weatherInfoMargin = top + 51;
 

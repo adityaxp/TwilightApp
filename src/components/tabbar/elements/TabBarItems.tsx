@@ -5,12 +5,15 @@ import ListIcon from "../icons/ListIcon";
 import TrapezoidBackground from "./TrapezoidBackground";
 import { SIZES } from "../../../themes";
 import CircleButton from "./CircleButton";
-
+import { ParamListBase, useNavigation } from "@react-navigation/native";
+import { StackNavigationProp } from "@react-navigation/stack";
+import { eventEmitter } from "../../../utils/EventEmitter";
 const TabBarItems = () => {
   const trapezoidWidth = SIZES.width * 0.68;
   const trapezoidHeight = SIZES.height * 0.12;
   const circleRadius = (trapezoidHeight * 0.51) / 2;
   const buttonCenterX = SIZES.width / 2 - circleRadius;
+  const navigation = useNavigation<StackNavigationProp<ParamListBase>>();
   return (
     <View
       style={{
@@ -21,7 +24,9 @@ const TabBarItems = () => {
         paddingHorizontal: 32,
       }}
     >
-      <MapIcon />
+      <Pressable onPress={() => eventEmitter.emit("locationEvent")}>
+        <MapIcon />
+      </Pressable>
       <TrapezoidBackground width={trapezoidWidth} height={trapezoidHeight} />
       <Pressable
         style={{
@@ -36,7 +41,7 @@ const TabBarItems = () => {
           <CircleButton radius={circleRadius} pressed={pressed} />
         )}
       </Pressable>
-      <Pressable onPress={() => {}}>
+      <Pressable onPress={() => navigation.navigate("list")}>
         <ListIcon />
       </Pressable>
     </View>
