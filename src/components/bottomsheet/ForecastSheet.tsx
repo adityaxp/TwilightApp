@@ -1,5 +1,5 @@
 import { StyleSheet, Text, View } from "react-native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import BottomSheet from "@gorhom/bottom-sheet";
 import { COLORS, SIZES } from "../../themes";
 import ForecastSheetBackground from "./ForecastSheetBackground";
@@ -19,10 +19,20 @@ import UvIndexWidget from "../forecast/widgets/UvIndexWidget";
 import WindWidget from "../forecast/widgets/WindWidget";
 import SunriseWidget from "../forecast/widgets/SunriseWidget";
 import { ScrollView } from "react-native-gesture-handler";
+import Animated, {
+  useAnimatedReaction,
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+} from "react-native-reanimated";
+import { useForecastSheetPosition } from "../../context/ForecastSheetContext";
 
 const ForecastSheet = () => {
   const snapPoints = ["38.5%", "83%"];
   const snapPointOne = SIZES.height * (parseFloat(snapPoints[0]) / 100);
+  const snapPointTwo = SIZES.height * (parseFloat(snapPoints[1]) / 100);
+  const minY = SIZES.height - snapPointTwo;
+  const maxY = SIZES.width - snapPointOne;
   const cornerRadius = 44;
   const capsuleRadius = 30;
   const capsuleHeight = SIZES.height * 0.17;
@@ -30,6 +40,34 @@ const ForecastSheet = () => {
   const widgetSize = SIZES.width / 2 - 20;
   const [selectedForecastType, setSelectedForecastType] =
     useState<ForecastType>(ForecastType.Hourly);
+  const currentPosition = useSharedValue(0);
+  const animatedPosition = useForecastSheetPosition();
+  const translateXHourly = useSharedValue(0);
+  const translateXWeekly = useSharedValue(SIZES.width);
+  const animatedHourlyStyles = useAnimatedStyle(() => {
+    return {
+      transform: [{ translateX: translateXHourly.value }],
+    };
+  });
+  const animatedWeeklyStyles = useAnimatedStyle(() => {
+    return {
+      transform: [{ translateX: translateXWeekly.value }],
+    };
+  });
+  useEffect(() => {
+    if (selectedForecastType === ForecastType.Weekly) {
+      translateXHourly.value = withTiming(-SIZES.width);
+      translateXWeekly.value = withTiming(-SIZES.width);
+    } else {
+      translateXHourly.value = withTiming(0);
+      translateXWeekly.value = withTiming(SIZES.width);
+    }
+  }, [selectedForecastType]);
+  const normalizePosition = (position: number) => {
+    "worklet";
+    return ((position - maxY) / (maxY - minY)) * -1;
+  };
+
   return (
     <BottomSheet
       snapPoints={snapPoints}
@@ -47,19 +85,34 @@ const ForecastSheet = () => {
       )}
     >
       <>
-        <ScrollView>
-          <ForecastControl onPress={(type) => setSelectedForecastType(type)} />
-          <Seperator width={SIZES.width} height={3} />
-          <ForecastScroll
-            capsuleWidth={capsulWidth}
-            capsuleHeight={capsuleHeight}
-            capsuleRadius={capsuleRadius}
-            forecasts={
-              selectedForecastType === ForecastType.Hourly ? hourly : weekly
-            }
-          />
-          <View style={{ flex: 1, paddingTop: 30, paddingBottom: 50 }}>
+        <ForecastControl onPress={(type) => setSelectedForecastType(type)} />
+        <Seperator width={SIZES.width} height={3} />
+        <ScrollView
+          style={{ flex: 1 }}
+          contentContainerStyle={{ paddingBottom: 10 }}
+        >
+          <View style={{ flexDirection: "row" }}>
+            <Animated.View style={[animatedHourlyStyles]}>
+              <ForecastScroll
+                capsuleWidth={capsulWidth}
+                capsuleHeight={capsuleHeight}
+                capsuleRadius={capsuleRadius}
+                forecasts={hourly}
+              />
+            </Animated.View>
+
+            <Animated.View style={[animatedWeeklyStyles]}>
+              <ForecastScroll
+                capsuleWidth={capsulWidth}
+                capsuleHeight={capsuleHeight}
+                capsuleRadius={capsuleRadius}
+                forecasts={weekly}
+              />
+            </Animated.View>
+          </View>
+          <View style={{ flex: 1, paddingTop: 30, paddingBottom: widgetSize }}>
             <AirQualityWidget width={SIZES.width - 30} height={150} />
+
             <View
               style={{
                 flexDirection: "row",
