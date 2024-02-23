@@ -10,7 +10,7 @@ const WeatherTabBar = () => {
 
   return (
     <BlurView
-      intensity={50}
+      intensity={15.9}
       tint="dark"
       style={{
         height: tabBarHeight,
